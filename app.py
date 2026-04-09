@@ -1,110 +1,122 @@
 import streamlit as st
 import pandas as pd
-import datetime
 
-# --- إعدادات النظام الأساسية ---
-st.set_page_config(page_title="نظام القيادة الإدارية المتكامل", layout="wide")
+# 1. إعدادات الصفحة والجماليات
+st.set_page_config(page_title="نظام القيادة الإدارية 2026", layout="wide", initial_sidebar_state="expanded")
 
-# --- نظام الحماية والترخيص (للبيع) ---
+# 2. حقن كود CSS لتغيير شكل التطبيق جذرياً (واجهة 2026)
+st.markdown("""
+    <style>
+    @import url('https://googleapis.com');
+    
+    html, body, [class*="css"] {
+        font-family: 'Cairo', sans-serif;
+        text-align: right;
+    }
+    
+    /* خلفية زجاجية للكروت */
+    .stMetric {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    }
+    
+    /* تصميم الأزرار */
+    .stButton>button {
+        width: 100%;
+        border-radius: 12px;
+        height: 3em;
+        background: linear-gradient(45deg, #1e5631, #a7282e);
+        color: white;
+        border: none;
+        transition: 0.3s;
+    }
+    .stButton>button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    /* تنسيق الهيدر */
+    .header-style {
+        background: linear-gradient(to left, #1e5631, #ffffff, #a7282e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+        font-size: 35px;
+        text-align: center;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# 3. نظام الحماية (مفتاح التفعيل)
 if 'auth' not in st.session_state:
     st.session_state['auth'] = False
 
-def check_license(key):
-    # قائمة مفاتيح التفعيل للمؤسسات التي تدفع لك
-    valid_keys = ["CHLEF-2026", "ALGER-EDU", "PRO-ADMIN-01"]
-    return key in valid_keys
-
 if not st.session_state['auth']:
-    st.markdown('<div style="text-align:center"><img src="https://githubusercontent.com" width="150"></div>', unsafe_allow_html=True)
-    st.title("🔐 بوابة نظام القيادة الإدارية")
-    st.info("يرجى إدخال مفتاح التفعيل لفتح خدمات المؤسسة")
-    license_key = st.text_input("مفتاح الترخيص:", type="password")
-    if st.button("تفعيل النظام"):
-        if check_license(license_key):
-            st.session_state['auth'] = True
-            st.success("تم تفعيل النسخة بنجاح!")
-            st.rerun()
-        else:
-            st.error("مفتاح خاطئ! تواصل مع المالك للحصول على التفعيل.")
+    st.markdown('<div style="text-align:center"><img src="https://githubusercontent.com" width="180"></div>', unsafe_allow_html=True)
+    st.markdown("<h1 class='header-style'>نظام القيادة الإدارية المتكامل</h1>", unsafe_allow_html=True)
+    
+    with st.container():
+        st.write("---")
+        st.subheader("🔑 تفعيل النسخة المعتمدة")
+        key = st.text_input("أدخل مفتاح الترخيص الخاص بالمؤسسة:", type="password")
+        if st.button("🚀 فتح النظام"):
+            if key == "CHLEF-2026":
+                st.session_state['auth'] = True
+                st.balloons()
+                st.rerun()
+            else:
+                st.error("المفتاح غير صحيح. يرجى مراجعة المبرمج.")
 else:
-    # --- الواجهة الرئيسية بعد التفعيل ---
-    st.sidebar.image("https://githubusercontent.com", width=80)
-    st.sidebar.title("🛂 لوحة التحكم")
-    choice = st.sidebar.selectbox("اختر الفضاء الإداري:", 
-        ["🏠 الرئيسية", "💰 المقتصد", "👨‍🏫 فضاء الأستاذ", "📋 إدارة التلاميذ والكودبار", "⚖️ القانون والأرشيف"])
+    # 4. لوحة التحكم الجانبية (Glassmorphism Sidebar)
+    with st.sidebar:
+        st.image("https://githubusercontent.com", width=120)
+        st.markdown("### 🛂 الصلاحيات")
+        choice = st.radio("", ["🏠 لوحة التحكم", "💰 المقتصد والمالية", "👨‍🏫 فضاء الأستاذ", "📋 الكودبار والتلاميذ", "⚖️ المكتبة والأرشيف"])
+        st.write("---")
+        if st.button("🔴 خروج"):
+            st.session_state['auth'] = False
+            st.rerun()
 
-    # العناوين الرسمية
-    st.markdown("<h2 style='text-align:center; color:#1e5631;'>الجمهورية الجزائرية الديمقراطية الشعبية</h2>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align:center; color:#1e5631;'>وزارة التربية الوطنية - ولاية الشلف</h3>", unsafe_allow_html=True)
-    st.write("---")
+    # 5. محتوى الأقسام
+    st.markdown(f"<h1 class='header-style'>{choice}</h1>", unsafe_allow_html=True)
 
-    # --- 1. الشاشة الرئيسية ---
-    if choice == "🏠 الرئيسية":
-        st.header("📍 بيانات المؤسسة")
-        school = st.text_input("اسم المؤسسة التعليمية:", "ثانوية العقيد لطفي")
+    if choice == "🏠 لوحة التحكم":
+        st.write("📍 **المؤسسة:** ثانوية العقيد لطفي - ولاية الشلف")
         col1, col2, col3 = st.columns(3)
-        col1.metric("إجمالي التلاميذ", "1240", "+5")
-        col2.metric("الميزانية المستهلكة", "35%", "مستقر")
-        col3.metric("نسبة الغيابات", "2.1%", "-0.5%")
-
-    # --- 2. فضاء المقتصد ---
-    elif choice == "💰 المقتصد":
-        st.header("💵 تسيير الميزانية والجرد الذكي")
-        mizania = st.number_input("الميزانية السنوية (دج):", value=2000000)
+        with col1: st.metric("التلاميذ", "1,240", "+12")
+        with col2: st.metric("الميزانية", "45%", "-2%")
+        with col3: st.metric("الحضور", "98%", "+1%")
         
-        tab1, tab2 = st.tabs(["📊 تقسيم الميزانية", "📸 جرد الفواتير"])
-        with tab1:
-            st.write("التوزيع حسب الأبواب:")
-            st.info(f"إطعام (50%): {mizania*0.5:,} دج")
-            st.info(f"صيانة (20%): {mizania*0.2:,} دج")
-            st.info(f"أدوات تربوية (30%): {mizania*0.3:,} دج")
-        with tab2:
-            with st.expander("فتح كاميرا الجرد"):
-                img = st.camera_input("صوّر الفاتورة")
-                if img: st.success("تم الالتقاط! جاري استخراج البيانات للجرد التلقائي.")
+        st.markdown("### 📢 إعلانات المديرية")
+        st.info("إعلان: انطلاق عملية الجرد السنوي للوسائل التربوية ابتداءً من الأسبوع القادم.")
 
-    # --- 3. فضاء الأستاذ (الحقيبة الرقمية) ---
+    elif choice == "💰 المقتصد والمالية":
+        tab1, tab2 = st.tabs(["💵 تسيير الميزانية", "📸 جرد الفواتير"])
+        with tab1:
+            st.write("توزيع الميزانية (دج):")
+            miz = st.number_input("الميزانية الكلية:", value=2500000)
+            st.write(f"🔹 الإطعام: {miz*0.5:,} | 🔹 الصيانة: {miz*0.2:,}")
+        with tab2:
+            st.camera_input("التقط صورة الفاتورة للجرد الآلي")
+
     elif choice == "👨‍🏫 فضاء الأستاذ":
-        st.header("📚 الحقيبة البيداغوجية للأستاذ")
-        sub = st.selectbox("المادة:", ["رياضيات", "علوم", "فيزياء", "لغة عربية"])
-        
-        tab1, tab2, tab3 = st.tabs(["📝 المذكرات", "📖 ملخصات الدروس", "📂 تطبيقات وتلاميذي"])
-        with tab1:
-            st.subheader("إدارة المذكرات")
-            st.file_uploader("رفع مذكرة PDF")
-            st.write("قائمة المذكرات الحالية متوفرة للتحميل.")
-        with tab2:
-            st.subheader("دروس مدعومة")
-            st.button(f"تحميل ملخصات {sub}")
-        with tab3:
-            st.subheader("تطبيقات ونتائج")
-            st.button("إرسال تمارين للقسم")
+        st.subheader("📝 مذكرات وملخصات الأستاذ")
+        col1, col2 = st.columns(2)
+        with col1: st.button("📁 تحميل المذكرات الوزارية")
+        with col2: st.button("📖 رفع ملخصات الدروس")
+        st.markdown("---")
+        st.write("📜 **القانون الداخلي:** الالتزام بالهندام والوقت الرسمي.")
 
-    # --- 4. إدارة التلاميذ والكودبار ---
-    elif choice == "📋 إدارة التلاميذ والكودبار":
-        st.header("📋 أتمتة قوائم التلاميذ")
-        with st.expander("📸 تصوير القائمة الاسمية"):
-            list_img = st.camera_input("صوّر قائمة القسم")
-            if list_img:
-                st.success("تم تحليل القائمة!")
-                df = pd.DataFrame({
-                    "اسم التلميذ": ["محمد. ب", "سارة. ج", "أمين. ك"],
-                    "الكودبار": ["|||| 101", "|||| 102", "|||| 103"]
-                })
-                st.table(df)
+    elif choice == "📋 الكودبار والتلاميذ":
+        st.subheader("🏷️ أتمتة الكودبار")
+        cam = st.camera_input("صوّر القائمة الورقية لاستخراج التلاميذ")
+        if cam:
+            st.success("تم تحليل القائمة وتوليد الأكواد بنجاح!")
+            st.table(pd.DataFrame({"الاسم": ["محمد بوضياف", "أحمد زبانة"], "الكود": ["1001", "1002"]}))
 
-    # --- 5. القانون والأرشيف ---
-    elif choice == "⚖️ القانون والأرشيف":
-        st.header("⚖️ المرجعية القانونية والأرشيف")
-        with st.expander("📄 القانون الداخلي للمؤسسة"):
-            st.write("تحميل واطلاع على بنود القانون الداخلي.")
-        with st.expander("📜 القانون الأساسي لعمال التربية"):
-            st.write("مرجع الحقوق والواجبات المهنية.")
-        with st.expander("🗄️ الأرشيف السنوي"):
-            year = st.selectbox("اختر السنة:", ["2024", "2025", "2026"])
-            st.button(f"تحميل أرشيف سنة {year}")
-
-    # تذييل الحقوق (لأغراض البيع)
     st.markdown("---")
-    st.markdown("<p style='text-align:center; color:grey;'>نظام القيادة الإدارية v4.0 | تصميم تجاري محمي © 2026 | ولاية الشلف</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center; color:grey;'>نظام القيادة الإدارية الذكي v5.0 | جميع الحقوق محفوظة © 2026</p>", unsafe_allow_html=True)
     
