@@ -1,109 +1,132 @@
 import streamlit as st
 import pandas as pd
-from PIL import Image
+import datetime
 
-# 1. إعدادات الواجهة المتطورة
-st.set_page_config(page_title="نظام القيادة الإدارية 2026", layout="wide")
+# 1. إعدادات الواجهة والجماليات
+st.set_page_config(page_title="نظام القيادة الإدارية 2026/2027", layout="wide")
 
-# 2. لمسات 2026 (CSS الشامل)
 st.markdown("""
     <style>
     @import url('https://googleapis.com');
     * { font-family: 'Cairo', sans-serif; text-align: right; }
-    
-    /* ستايل العناوين */
-    .main-header {
-        background: linear-gradient(to left, #1e5631, #ffffff, #a7282e);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 35px; font-weight: bold; text-align: center;
-        padding: 20px;
-    }
-    
-    /* تصميم الأزرار */
-    .stButton>button {
-        background: linear-gradient(45deg, #1e5631, #a7282e) !important;
-        color: white !important;
-        border-radius: 15px !important;
-        font-weight: bold !important;
-        width: 100%; border: none !important;
-    }
+    .main-header { background: linear-gradient(to left, #1e5631, #a7282e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 35px; font-weight: bold; text-align: center; padding: 10px; }
+    .official-doc { border: 2px solid black; padding: 30px; background: white; color: black; width: 100%; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .report-card { border: 3px double #1e5631; padding: 20px; background: #fdfdfd; color: black; }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. نظام الحماية
+# 2. نظام الحماية
 if 'auth' not in st.session_state:
     st.session_state['auth'] = False
 
 if not st.session_state['auth']:
-    st.markdown('<div style="text-align:center"><img src="https://githubusercontent.com" width="180"></div>', unsafe_allow_html=True)
-    st.markdown("<div class='main-header'>الجمهورية الجزائرية الديمقراطية الشعبية</div>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align:center;'>نظام القيادة الإدارية للمتوسطات والثانويات</h3>", unsafe_allow_html=True)
-    st.write("---")
-    key = st.text_input("🔑 أدخل مفتاح التفعيل للمؤسسة:", type="password")
-    if st.button("🚀 دخول للنظام"):
+    st.markdown('<div style="text-align:center"><img src="https://githubusercontent.com" width="150"></div>', unsafe_allow_html=True)
+    st.markdown("<div class='main-header'>نظام القيادة الإدارية المتكامل</div>", unsafe_allow_html=True)
+    key = st.text_input("🔑 كود تفعيل المؤسسة:", type="password")
+    if st.button("🚀 الدخول للنظام"):
         if key == "CHLEF-2026":
             st.session_state['auth'] = True
-            st.balloons()
             st.rerun()
 else:
-    # 4. القائمة الجانبية الشاملة (كل ما كان ناقصاً)
+    # 3. القائمة الجانبية المتطورة
     with st.sidebar:
-        st.markdown('<div style="text-align:center"><img src="https://githubusercontent.com" width="100"></div>', unsafe_allow_html=True)
-        st.write("---")
-        choice = st.radio("🛂 اختر الفضاء الإداري:", [
-            "🏢 مدير المؤسسة", 
-            "💰 المقتصد والمالية", 
-            "📝 نائب المدير", 
-            "👨‍🏫 فضاء الأستاذ", 
-            "📋 الكودبار والتلاميذ", 
-            "📦 أمين المخزن", 
-            "📚 المكتبة والأرشيف", 
-            "👷 العمال والخدمات"
+        st.image("https://githubusercontent.com", width=100)
+        choice = st.sidebar.selectbox("🛂 اختر الخدمة الإدارية:", [
+            "🏠 الرئيسية",
+            "📄 استخراج الشهادة المدرسية", 
+            "📊 كشوف النقاط (المعدلات)", 
+            "🆕 تسجيل التلاميذ والبطاقات",
+            "💰 فضاء المقتصد",
+            "👨‍🏫 فضاء الأستاذ"
         ])
-        if st.button("🔴 تسجيل خروج"):
+        if st.sidebar.button("🔴 تسجيل خروج"):
             st.session_state['auth'] = False
             st.rerun()
 
-    # 5. محتوى الأقسام (تفعيل كل الأزرار)
     st.markdown(f"<div class='main-header'>{choice}</div>", unsafe_allow_html=True)
 
-    if choice == "🏢 مدير المؤسسة":
+    # --- 1. قسم الشهادة المدرسية ---
+    if choice == "📄 استخراج الشهادة المدرسية":
+        st.subheader("📝 توليد شهادة مدرسية فورية")
         col1, col2 = st.columns(2)
-        col1.metric("إحصائيات الحضور", "98%", "+2%")
-        col2.metric("جاهزية المؤسسة", "100%", "مثالي")
-        st.info("📢 إشعار للمدير: تم تحديث قوائم التلاميذ السنوية آلياً.")
+        with col1:
+            name = st.text_input("الاسم واللقب:")
+            birth_info = st.text_input("تاريخ ومكان الازدياد:")
+        with col2:
+            level = st.selectbox("السنة الدراسية:", ["1 ثانوي", "2 ثانوي", "3 ثانوي", "متوسط"])
+            school_year = "2026 / 2027"
 
-    elif choice == "💰 المقتصد والمالية":
-        st.subheader("💵 تسيير الميزانية والجرد الذكي")
-        miz = st.number_input("الميزانية الكلية (دج):", value=3000000)
-        st.write(f"🔹 الإطعام: {miz*0.5:,} | 🔹 الصيانة: {miz*0.2:,}")
-        st.camera_input("📸 صوّر الفاتورة للجرد التلقائي")
+        if st.button("🖨️ معاينة وطباعة الشهادة"):
+            st.markdown(f"""
+            <div class="official-doc">
+                <p style="text-align:center; font-weight:bold;">الجمهورية الجزائرية الديمقراطية الشعبية<br>وزارة التربية الوطنية</p>
+                <div style="display:flex; justify-content:space-between;">
+                    <span>مديرية التربية لولاية الشلف</span>
+                    <span>المؤسسة: ....................</span>
+                </div>
+                <h2 style="text-align:center; text-decoration: underline;">شهادة مدرسية</h2>
+                <p style="font-size:18px; line-height:2;">
+                يشهد مدير المؤسسة المذكورة أعلاه أن التلميذ(ة): <b>{name}</b><br>
+                المولود(ة) في: <b>{birth_info}</b><br>
+                يتابع دراسته بالمؤسسة بانتظام في قسم: <b>{level}</b><br>
+                للسنة الدراسية: <b>{school_year}</b> تحت رقم: <b>{datetime.datetime.now().strftime('%H%M%S')}</b>
+                </p>
+                <br>
+                <div style="text-align:left;">
+                    حرر بـ: الشلف في {datetime.date.today()}<br>
+                    <b>إمضاء ومدير المؤسسة</b>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-    elif choice == "👨‍🏫 فضاء الأستاذ":
-        tab1, tab2, tab3 = st.tabs(["📝 المذكرات", "📖 الدروس", "⚖️ القانون الداخلي"])
-        with tab1: st.file_uploader("رفع مذكرة الأستاذ PDF")
-        with tab2: st.button("تحميل ملخصات المواد")
-        with tab3: st.write("📜 **القانون الداخلي:** مادة 01: الالتزام بالوقت الرسمي والواجب التربوي.")
+    # --- 2. قسم كشوف النقاط ---
+    elif choice == "📊 كشوف النقاط (المعدلات)":
+        st.subheader("📉 حساب المعدل الفصلي واستخراج الكشف")
+        col1, col2 = st.columns(2)
+        with col1:
+            st_name = st.text_input("اسم التلميذ:")
+            math = st.number_input("الرياضيات:", 0.0, 20.0, 10.0)
+            physics = st.number_input("الفيزياء:", 0.0, 20.0, 10.0)
+        with col2:
+            st_level = st.text_input("القسم:", "3 ثانوي")
+            arabic = st.number_input("اللغة العربية:", 0.0, 20.0, 10.0)
+            science = st.number_input("العلوم الطبيعية:", 0.0, 20.0, 10.0)
 
-    elif choice == "📋 الكودبار والتلاميذ":
-        st.subheader("🏷️ أتمتة الكودبار والأرشفة")
-        st.camera_input("📸 صوّر القائمة الورقية لاستخراج الكودبار")
-        st.write("سوف يتم إنشاء كودبار لكل تلميذ بجانب اسمه آلياً.")
+        # حساب المعدل البسيط
+        total = (math + physics + arabic + science) / 4
+        
+        if st.button("📊 توليد كشف النقاط"):
+            st.markdown(f"""
+            <div class="report-card">
+                <h3 style="text-align:center; color:#1e5631;">كشف نقاط الفصل الأول 2026/2027</h3>
+                <p><b>التلميذ:</b> {st_name} | <b>القسم:</b> {st_level}</p>
+                <table style="width:100%; border-collapse: collapse; text-align:center;">
+                    <tr style="background:#1e5631; color:white;">
+                        <th style="border:1px solid #ddd; padding:8px;">المادة</th>
+                        <th style="border:1px solid #ddd; padding:8px;">النقطة</th>
+                    </tr>
+                    <tr><td>الرياضيات</td><td>{math}</td></tr>
+                    <tr><td>الفيزياء</td><td>{physics}</td></tr>
+                    <tr><td>اللغة العربية</td><td>{arabic}</td></tr>
+                    <tr><td>العلوم الطبيعية</td><td>{science}</td></tr>
+                    <tr style="background:#eee; font-weight:bold;">
+                        <td>المعدل الفصلي</td>
+                        <td style="color:{'green' if total >= 10 else 'red'};">{total:.2f} / 20</td>
+                    </tr>
+                </table>
+                <p style="text-align:center; margin-top:10px;"><b>الملاحظة:</b> {'ناجح' if total >= 10 else 'راسب'}</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    elif choice == "📦 أمين المخزن":
-        st.subheader("📦 جرد الوسائل")
-        st.data_editor({"الوسيلة": ["طاولات", "كراسي", "حواسيب"], "الكمية": [200, 400, 15], "الحالة": ["جيد", "صيانة", "جديد"]})
+    # --- باقي الأقسام ---
+    elif choice == "🆕 تسجيل التلاميذ والبطاقات":
+        st.subheader("📝 تسجيل وتوليد البطاقات")
+        st.info("هذا القسم مربوط بنظام الكودبار الذي صممناه سابقاً.")
 
-    elif choice == "📝 نائب المدير":
-        st.subheader("🗓️ تنظيم الجداول والغيابات")
-        st.button("توليد جدول الحراسة الأسبوعي")
-        st.camera_input("📸 مسح غياب التلاميذ بالكودبار")
-
-    elif choice == "📚 المكتبة والأرشيف":
-        st.subheader("📚 إعارة الكتب والأرشفة الرقمية")
-        st.text_input("ابحث عن كتاب أو ملف أرشيف (سنة 2024-2026):")
-        st.button("جرد المكتبة السنوي")
+    elif choice == "🏠 الرئيسية":
+        st.markdown("<h2 style='text-align:center;'>مرحباً بك في لوحة تحكم القيادة الإدارية</h2>", unsafe_allow_html=True)
+        st.write("استخدم القائمة الجانبية لإدارة المؤسسة واستخراج الوثائق.")
 
 st.markdown("---")
-st.markdown("<p style='text-align:center; color:grey;'>نظام القيادة الإدارية الذكي v6.0 | ولاية الشلف © 2026</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:grey;'>نظام القيادة الإدارية v8.0 | وثائق رسمية 2026/2027 | ولاية الشلف</p>", unsafe_allow_html=True)
+    
